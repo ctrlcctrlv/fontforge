@@ -2087,12 +2087,12 @@ static void PSPrivate_MatrixInit(struct matrixinit *mi,struct gfi_data *d) {
     mi->col_cnt = 2;
     mi->col_init = psprivate_ci;
 
-    mi->initial_row_cnt = sf->private==NULL?0:sf->private->next;
+    mi->initial_row_cnt = sf->private_==NULL?0:sf->private_->next;
     md = calloc(2*(mi->initial_row_cnt+1),sizeof(struct matrix_data));
-    if ( sf->private!=NULL ) {
-	for ( i=j=0; i<sf->private->next; ++i ) {
-	    md[2*j  ].u.md_str = copy(sf->private->keys[i]);
-	    md[2*j+1].u.md_str = copy(sf->private->values[i]);
+    if ( sf->private_!=NULL ) {
+	for ( i=j=0; i<sf->private_->next; ++i ) {
+	    md[2*j  ].u.md_str = copy(sf->private_->keys[i]);
+	    md[2*j+1].u.md_str = copy(sf->private_->values[i]);
 	    ++j;
 	}
     }
@@ -4454,8 +4454,8 @@ return(true);
 	for ( j=0; j<_sf->subfontcnt; ++j )
 	    _sf->subfonts[j]->hasvmetrics = vmetrics;
 
-	PSDictFree(sf->private);
-	sf->private = GFI_ParsePrivate(d);
+	PSDictFree(sf->private_);
+	sf->private_ = GFI_ParsePrivate(d);
 
 	if ( d->names_set )
 	    StoreTTFNames(d);

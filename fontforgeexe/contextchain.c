@@ -424,8 +424,8 @@ static char *classruleitem(struct fpst_rule *r,struct matrix_data **classes, int
 
     len = 0;
     for ( i=0; i<3; ++i ) {
-	for ( k=0; k<(&r->u.class.ncnt)[i]; ++k ) {
-	    int c = (&r->u.class.nclasses)[i][k];
+	for ( k=0; k<(&r->u.class_.ncnt)[i]; ++k ) {
+	    int c = (&r->u.class_.nclasses)[i][k];
 	    if ( classes[i][cols*c+0].u.md_str!=NULL && *classes[i][cols*c+0].u.md_str!='\0' )
 		len += strlen(classes[i][cols*c+0].u.md_str)+1;
 	    else {
@@ -436,8 +436,8 @@ static char *classruleitem(struct fpst_rule *r,struct matrix_data **classes, int
     }
 
     ret = pt = malloc((len+8+seqlookuplen(r)) * sizeof(unichar_t));
-    for ( k=r->u.class.bcnt-1; k>=0; --k ) {
-	int c = r->u.class.bclasses[k];
+    for ( k=r->u.class_.bcnt-1; k>=0; --k ) {
+	int c = r->u.class_.bclasses[k];
 	if ( classes[1][cols*c+0].u.md_str!=NULL && *classes[1][cols*c+0].u.md_str!='\0' ) {
 	    strcpy(pt,classes[1][cols*c+0].u.md_str);
 	    pt += strlen( pt );
@@ -448,8 +448,8 @@ static char *classruleitem(struct fpst_rule *r,struct matrix_data **classes, int
 	}
     }
     *pt++ = '|';
-    for ( k=0; k<r->u.class.ncnt; ++k ) {
-	int c = r->u.class.nclasses[k];
+    for ( k=0; k<r->u.class_.ncnt; ++k ) {
+	int c = r->u.class_.nclasses[k];
 	if ( classes[0][cols*c+0].u.md_str!=NULL && *classes[0][cols*c+0].u.md_str!='\0' ) {
 	    strcpy(pt,classes[0][cols*c+0].u.md_str);
 	    pt += strlen( pt );
@@ -461,8 +461,8 @@ static char *classruleitem(struct fpst_rule *r,struct matrix_data **classes, int
     }
     if ( pt[-1]==' ' ) --pt;
     *pt++ = '|';
-    for ( k=0; k<r->u.class.fcnt; ++k ) {
-	int c = r->u.class.fclasses[k];
+    for ( k=0; k<r->u.class_.fcnt; ++k ) {
+	int c = r->u.class_.fclasses[k];
 	if ( classes[2][cols*c+0].u.md_str!=NULL && *classes[2][cols*c+0].u.md_str!='\0' ) {
 	    strcpy(pt,classes[2][cols*c+0].u.md_str);
 	    pt += strlen( pt );
@@ -497,8 +497,8 @@ static void classruleitem2rule(SplineFont *sf,const char *ruletext,struct fpst_r
 	    while ( !isspace(ch) && ch!='|' && ch!=0x21d2 && ch!='\0' )
 		ch = utf8_ildb((const char **) &pt);
 	}
-	(&r->u.class.ncnt)[i] = len;
-	(&r->u.class.nclasses)[i] = malloc(len*sizeof(uint16));
+	(&r->u.class_.ncnt)[i] = len;
+	(&r->u.class_.nclasses)[i] = malloc(len*sizeof(uint16));
 	len = 0;
 	if ( ch=='\0' || ch==0x21d2 )
     break;
@@ -523,14 +523,14 @@ static void classruleitem2rule(SplineFont *sf,const char *ruletext,struct fpst_r
 		nstart = pt;
 		ch = utf8_ildb((const char **) &pt);
 	    }
-	    (&r->u.class.nclasses)[i][len] = strtol(start,&end,10);
+	    (&r->u.class_.nclasses)[i][len] = strtol(start,&end,10);
 	    if ( end<nstart ) {		/* Not a number, must be a class name */
 		for ( k=0; k<clen[i]; ++k ) {
 		    if ( classes[i][cols*k+0].u.md_str==NULL )
 		continue;
 		    if ( strlen(classes[i][cols*k+0].u.md_str)==nstart-start &&
 			    strncmp(classes[i][cols*k+0].u.md_str,start,nstart-start)==0 ) {
-			(&r->u.class.nclasses)[i][len] = k;
+			(&r->u.class_.nclasses)[i][len] = k;
 		break;
 		    }
 		}
@@ -547,10 +547,10 @@ static void classruleitem2rule(SplineFont *sf,const char *ruletext,struct fpst_r
 	}
     }
     /* reverse the backtrack */
-    for ( i=0; i<r->u.class.bcnt/2; ++i ) {
-	int temp = r->u.class.bclasses[i];
-	r->u.class.bclasses[i] = r->u.class.bclasses[r->u.class.bcnt-1-i];
-	r->u.class.bclasses[r->u.class.bcnt-1-i] = temp;
+    for ( i=0; i<r->u.class_.bcnt/2; ++i ) {
+	int temp = r->u.class_.bclasses[i];
+	r->u.class_.bclasses[i] = r->u.class_.bclasses[r->u.class_.bcnt-1-i];
+	r->u.class_.bclasses[r->u.class_.bcnt-1-i] = temp;
     }
 
     if ( ch=='\0' || *pt=='\0' )
@@ -636,12 +636,12 @@ static int CCD_ReasonableClassNum(const unichar_t *umatch,GGadget *list,
 return( false );
 	    }
 	    if ( doit )
-		(&r->u.class.nclasses)[which][any] = val;
+		(&r->u.class_.nclasses)[which][any] = val;
 	    ++any;
 	}
 	if ( !doit ) {
-	    (&r->u.class.ncnt)[which] = any;
-	    (&r->u.class.nclasses)[which] = malloc(any*sizeof(uint16));
+	    (&r->u.class_.ncnt)[which] = any;
+	    (&r->u.class_.nclasses)[which] = malloc(any*sizeof(uint16));
 	}
     }
 return( true );
@@ -698,14 +698,14 @@ return;
 return;
 	}
 	/* reverse the backtrack */
-	for ( i=0; i<dummy.u.class.bcnt/2; ++i ) {
-	    int temp = dummy.u.class.bclasses[i];
-	    dummy.u.class.bclasses[i] = dummy.u.class.bclasses[dummy.u.class.bcnt-1-i];
-	    dummy.u.class.bclasses[dummy.u.class.bcnt-1-i] = temp;
+	for ( i=0; i<dummy.u.class_.bcnt/2; ++i ) {
+	    int temp = dummy.u.class_.bclasses[i];
+	    dummy.u.class_.bclasses[i] = dummy.u.class_.bclasses[dummy.u.class_.bcnt-1-i];
+	    dummy.u.class_.bclasses[dummy.u.class_.bcnt-1-i] = temp;
 	}
 	for ( i=0; i<dummy.lookup_cnt; ++i ) {
-	    if ( dummy.lookups[i].seq >= dummy.u.class.ncnt ) {
-		ff_post_error(_("Bad Sequence/Lookup List"),_("Sequence number out of bounds, must be less than %d (number of classes in list above)"), dummy.u.class.ncnt );
+	    if ( dummy.lookups[i].seq >= dummy.u.class_.ncnt ) {
+		ff_post_error(_("Bad Sequence/Lookup List"),_("Sequence number out of bounds, must be less than %d (number of classes in list above)"), dummy.u.class_.ncnt );
 return;
 	    }
 	}
@@ -864,13 +864,13 @@ static void CCD_NewClassRule(GGadget *classrules,int r,int c) {
     memset(&dummy,0,sizeof(dummy));
     classruleitem2rule(ccd->sf,rulelist[r].u.md_str,&dummy,classes,clen,ccols);
     GGadgetSetTitle8(GWidgetGetControl(ccd->gw,CID_ClassNumbers),
-	    (temp=classnumbers(dummy.u.class.ncnt,dummy.u.class.nclasses,classes[0],clen[0],ccols)));
+	    (temp=classnumbers(dummy.u.class_.ncnt,dummy.u.class_.nclasses,classes[0],clen[0],ccols)));
     free(temp);
     GGadgetSetTitle8(GWidgetGetControl(ccd->gw,CID_ClassNumbers+20),
-	    (temp=rclassnumbers(dummy.u.class.bcnt,dummy.u.class.bclasses,classes[1],clen[1],ccols)));
+	    (temp=rclassnumbers(dummy.u.class_.bcnt,dummy.u.class_.bclasses,classes[1],clen[1],ccols)));
     free(temp);
     GGadgetSetTitle8(GWidgetGetControl(ccd->gw,CID_ClassNumbers+40),
-	    (temp=classnumbers(dummy.u.class.fcnt,dummy.u.class.fclasses,classes[2],clen[2],ccols)));
+	    (temp=classnumbers(dummy.u.class_.fcnt,dummy.u.class_.fclasses,classes[2],clen[2],ccols)));
     free(temp);
 
     md = calloc(2*dummy.lookup_cnt,sizeof(struct matrix_data));
@@ -1018,8 +1018,8 @@ return;
 	ccols = ClassNamePrep(ccd,classes,clen);
 	for ( i=0; i<len; ++i ) {
 	    classruleitem2rule(ccd->sf,old[i].u.md_str,&fpst->rules[i],classes,clen,ccols);
-	    if ( fpst->rules[i].u.class.bcnt!=0 ) has[1] = true;
-	    if ( fpst->rules[i].u.class.fcnt!=0 ) has[2] = true;
+	    if ( fpst->rules[i].u.class_.bcnt!=0 ) has[1] = true;
+	    if ( fpst->rules[i].u.class_.fcnt!=0 ) has[2] = true;
 	}
 	for ( i=0; i<3; ++i ) {
 	    if ( i!=0 && !has[i] )
