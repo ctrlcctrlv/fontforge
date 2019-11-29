@@ -1939,14 +1939,9 @@ SplinePointList *SplinePointListTransformExtended(SplinePointList *base, real tr
 	if ( !anysel )		/* This splineset had no selected points it's unchanged */
     continue;
 
-	/* If we changed all the points, then transform the spiro version too */
-	/*  otherwise if we just changed some points, throw away the spiro */
-	if ( allsel ) {
-	    int i;
-	    for ( i=0; i<spl->spiro_cnt-1; ++i )
-		TransformSpiro(&spl->spiros[i], transform);
-	} else
-	    SplineSetSpirosClear(spl);
+    // It is not guaranteed that transformed spiros will make the same shape as untransformed!
+    // They must be thrown away if we're transforming in Bezier mode.
+    SplineSetSpirosClear(spl);
 
 	/* if we changed all the points then the control points are right */
 	/*  otherwise those near the edges may be wonky, fix 'em up */

@@ -3652,12 +3652,12 @@ void SplinePointListSet(SplinePointList *tobase, SplinePointList *frombase) {
 	    tsp->noprevcp = fsp->noprevcp;
 	    tsp->nonextcp = fsp->nonextcp;
 	    if ( first==NULL ) first = tsp;
-	    if ( tsp->next==NULL )
+	    if ( tsp->next==NULL || fsp->next==NULL )
 	break;
 	}
 	firstsp = NULL;
 	for ( tspline = tobase->first->next, fspline=frombase->first->next;
-		tspline!=NULL && tspline!=firstsp;
+		tspline!=NULL && tspline!=firstsp && frombase->spiro_cnt==0;
 		tspline=tspline->to->next, fspline=fspline->to->next ) {
 	    tspline->splines[0] = fspline->splines[0];
 	    tspline->splines[1] = fspline->splines[1];
@@ -3668,6 +3668,7 @@ void SplinePointListSet(SplinePointList *tobase, SplinePointList *frombase) {
 	if ( tobase->spiro_cnt==frombase->spiro_cnt ) {
 	    for ( i=0; i<tobase->spiro_cnt; ++i )
 		tobase->spiros[i] = frombase->spiros[i];
+		SSRegenerateFromSpiros(tobase);
 	}
     }
 }
